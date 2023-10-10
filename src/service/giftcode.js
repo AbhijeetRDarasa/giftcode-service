@@ -7,23 +7,28 @@ const createGiftCode = async (giftCode) => {
 
 const findGiftCode = async (giftCodeQuery) => {
   const data = {
-    code: giftCodeQuery.code
-  }
+    code: giftCodeQuery.code,
+  };
   const result = await db.GiftCode.findOne(data);
   return result;
 };
 
 const findGiftCodeUSed = async (giftCodeUsedQuery) => {
-  const result = await db.GiftCode.findOne({giftcode:giftCodeUsedQuery});
+  const result = await db.GiftCodeUsed.findOne(giftCodeUsedQuery);
+  return result;
+};
+
+const findCountByParams = async (query) => {
+  const result = await db.GiftCode.find(query).count();
   return result;
 };
 
 const createGiftCodeUsed = async (giftCodeUsed, giftCode) => {
-  const giftdata = await db.GiftCode.findOne({code:giftCode});
+  const giftdata = await db.GiftCode.findOne({ code: giftCode });
   if (giftdata != null) {
     const newGiftCodeUsed = await db.GiftCodeUsed.create(giftCodeUsed);
-    await addGiftCodeUsedToGiftCode(newGiftCodeUsed._id, giftdata);
-    await addGiftCodeToGiftCodeUsed(giftdata._id, newGiftCodeUsed);
+    //await addGiftCodeUsedToGiftCode(newGiftCodeUsed._id, giftdata);
+    //await addGiftCodeToGiftCodeUsed(giftdata._id, newGiftCodeUsed);
     return newGiftCodeUsed;
   } else {
     return giftdata;
@@ -47,13 +52,15 @@ const addGiftCodeToGiftCodeUsed = (giftCodeUsedId, giftCode) => {
 };
 
 const findListOfUsage = (giftCodeId) => {
-  return db.GiftCode.find({code:"abc123"}).populate("giftcode_usages", "-_id -__v -giftcodes");
-}
+  //return db.GiftCode.find({code:giftCodeId}).populate("giftcode_usages", "-_id -__v -giftcodes");
+  return db.GiftCode.find({ code: giftCodeId });
+};
 
 module.exports = {
   createGiftCode,
   createGiftCodeUsed,
   findGiftCode,
   findGiftCodeUSed,
-  findListOfUsage
+  findListOfUsage,
+  findCountByParams,
 };
